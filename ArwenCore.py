@@ -231,19 +231,19 @@ class TradeSimulator:
             print(signal)
 
         elif self.in_position and self.symbol_timeframe==f"{symbol}_{interval}":
-            if action == 'sell':
-                trade_fee = self.trade_fee * self.asset * price
-                trade_revenue = (self.asset*price) * (1-self.trade_fee)
-                pnl = (trade_revenue-self.trade_capital)
-                self.acc_bal = self.acc_bal + pnl
-                self.in_position = False
-                self.symbol_timeframe = None
-                self.stoploss = 0
-                self.takeprofit = 0
-                self.log_to_csv(symbol, interval, time, price, action, trade_fee, pnl)
-                print(signal)
+            # if action == 'sell':
+            #     trade_fee = self.trade_fee * self.asset * price
+            #     trade_revenue = (self.asset*price) * (1-self.trade_fee)
+            #     pnl = (trade_revenue-self.trade_capital)
+            #     self.acc_bal = self.acc_bal + pnl
+            #     self.in_position = False
+            #     self.symbol_timeframe = None
+            #     self.stoploss = 0
+            #     self.takeprofit = 0
+            #     self.log_to_csv(symbol, interval, time, price, action, trade_fee, pnl)
+            #     print(signal)
                 
-            elif (price >= self.takeprofit) or (price <= self.stoploss):
+            if (price >= self.takeprofit) or (price <= self.stoploss):
                 trade_fee = self.trade_fee * self.asset * price
                 trade_revenue = (self.asset*price) * (1-self.trade_fee)
                 pnl = (trade_revenue-self.trade_capital)
