@@ -20,4 +20,4 @@ symbols= ["BTCBUSD",
         "QNTBUSD",
         "TRXBUSD"]
 
-timeframes = ['5m']
+timeframes = ['15m']
