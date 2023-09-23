@@ -20,8 +20,8 @@ simulator = TradeSimulator(
     trade_capital=500,
     trade_fee=0.0075,
     trade_log_path="trade_log.csv",
-    stoploss=0.008,
-    takeprofit=0.01
+    stoploss=0.03,
+    takeprofit=0.04
 )
 state = False
 
