@@ -218,7 +218,6 @@ class TradeSimulator:
         time = signal['time']
         price = signal['price']
         action = signal['action']
-        state = self.in_position
 
         # Perform trade calculations based on the action
         if action == 'buy' and not self.in_position and (self.symbol_timeframe==f"{symbol}_{interval}" or self.symbol_timeframe is None):
@@ -228,8 +227,8 @@ class TradeSimulator:
             self.in_position = True
             self.stoploss = price - (price*self.stoploss_percent)
             self.takeprofit = price + (price*self.takeprofit_percent)
-            state = self.in_position
             self.log_to_csv(symbol, interval, time, price, action, trade_fee, 0)
+            print(signal)
 
         elif self.in_position and self.symbol_timeframe==f"{symbol}_{interval}":
             if action == 'sell':
@@ -239,10 +238,10 @@ class TradeSimulator:
                 self.acc_bal = self.acc_bal + pnl
                 self.in_position = False
                 self.symbol_timeframe = None
-                state = self.in_position
-                self.stoploss = None
-                self.takeprofit = None
+                self.stoploss = 0
+                self.takeprofit = 0
                 self.log_to_csv(symbol, interval, time, price, action, trade_fee, pnl)
+                print(signal)
                 
             elif (price >= self.takeprofit) or (price <= self.stoploss):
                 trade_fee = self.trade_fee * self.asset * price
@@ -251,12 +250,13 @@ class TradeSimulator:
                 self.acc_bal = self.acc_bal + pnl
                 self.in_position = False
                 self.symbol_timeframe = None
-                state = self.in_position
-                self.stoploss = None
-                self.takeprofit = None
+                self.stoploss = 0
+                self.takeprofit = 0
                 self.log_to_csv(symbol, interval, time, price, 'sell', trade_fee, pnl)
-        
-        return state
+                signal["action"] = "stoploss or target hit"
+                print(signal)
+
+        return self.in_position
 
 
 class SignalProcessor:
@@ -286,16 +286,13 @@ class SignalProcessor:
             signal['action'] = 'wait'
             return signal
         else:
-            print(signal_data["signal"].iloc[-1])
             transformed_data_X = self.transform_data(signal_data)
             predicted_signal = self.xgb.predict(transformed_data_X)
             if predicted_signal == 1:
                 if signal_data["signal"].iloc[-1] == -1:
                     signal['action'] = 'sell'
-                    print({"Time": time, "Symbol": symbol, "Action": "Sell", "Price": price})
                 else:
                     signal['action'] = 'buy'
-                    print({"Time": time, "Symbol": symbol, "Action": "Buy", "Price": price})
             else:
                 signal['action'] = 'wait'
 
@@ -332,7 +329,8 @@ class DefaultDriver:
                     'symbol': symbol,
                     'interval': timeframe,
                     'time': time,
-                    'price': price
+                    'price': price,
+                    'action': 'wait'
                 })
 
             if is_candle_closed:
