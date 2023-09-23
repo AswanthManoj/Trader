@@ -18,10 +18,10 @@ ws_manager = WebSocketManager
 db = InternalDataBase()
 simulator = TradeSimulator(
     trade_capital=500,
-    trade_fee=0.00,
+    trade_fee=0.0075,
     trade_log_path="trade_log.csv",
-    stoploss=0.0025,
-    takeprofit=0.005
+    stoploss=0.008,
+    takeprofit=0.01
 )
 state = False
 
@@ -45,7 +45,8 @@ def stream_data_processor(message):
                 'symbol': symbol,
                 'interval': timeframe,
                 'time': time,
-                'price': price
+                'price': price,
+                'action': 'wait'
             })
 
         if is_candle_closed:
